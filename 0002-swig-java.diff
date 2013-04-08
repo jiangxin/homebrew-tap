@@ -1,0 +1,40 @@
+diff --git a/configure b/configure
+index d45930f..26f3627 100755
+--- a/configure
++++ b/configure
+@@ -23382,7 +23382,10 @@ $as_echo_n "checking for JDK... " >&6; }
+       JRE_LIB_DIR="$JDK/jre/lib"
+   fi
+ 
+-  if test -f "$JDK/include/jni.h"; then
++  if test "$os_arch" = "Darwin" && test "$JDK" = "/Library/Java/Home"; then
++        JNI_INCLUDEDIR="/System/Library/Frameworks/JavaVM.framework/Headers"
++        JDK_SUITABLE=yes
++  elif test -f "$JDK/include/jni.h"; then
+         JNI_INCLUDEDIR="$JDK/include"
+     JDK_SUITABLE=yes
+   else
+@@ -23505,7 +23508,10 @@ $as_echo_n "checking for JDK... " >&6; }
+       JRE_LIB_DIR="$JDK/jre/lib"
+   fi
+ 
+-  if test -f "$JDK/include/jni.h"; then
++  if test "$os_arch" = "Darwin" && test "$JDK" = "/Library/Java/Home"; then
++        JNI_INCLUDEDIR="/System/Library/Frameworks/JavaVM.framework/Headers"
++        JDK_SUITABLE=yes
++  elif test -f "$JDK/include/jni.h"; then
+         JNI_INCLUDEDIR="$JDK/include"
+     JDK_SUITABLE=yes
+   else
+@@ -23631,7 +23637,10 @@ $as_echo_n "checking for JDK... " >&6; }
+       JRE_LIB_DIR="$JDK/jre/lib"
+   fi
+ 
+-  if test -f "$JDK/include/jni.h"; then
++  if test "$os_arch" = "Darwin" && test "$JDK" = "/Library/Java/Home"; then
++        JNI_INCLUDEDIR="/System/Library/Frameworks/JavaVM.framework/Headers"
++        JDK_SUITABLE=yes
++  elif test -f "$JDK/include/jni.h"; then
+         JNI_INCLUDEDIR="$JDK/include"
+     JDK_SUITABLE=yes
+   else

@@ -1,0 +1,59 @@
+diff --git a/subversion/libsvn_subr/path.c b/subversion/libsvn_subr/path.c
+index 19cfcae..2b936ad 100644
+--- a/subversion/libsvn_subr/path.c
++++ b/subversion/libsvn_subr/path.c
+@@ -59,6 +59,9 @@ svn_path_internal_style(const char *path, apr_pool_t *pool)
+   return svn_uri_internal_style(path, pool);
+ }
+ 
++#if defined(DARWIN)
++#include <CoreFoundation/CoreFoundation.h>
++#endif /* DARWIN */
+ 
+ const char *
+ svn_path_local_style(const char *path, apr_pool_t *pool)
+@@ -1073,6 +1076,36 @@ svn_path_cstring_to_utf8(const char **path_utf8,
+                          apr_pool_t *pool)
+ {
+   svn_boolean_t path_is_utf8;
++#if defined(DARWIN)
++  svn_error_t *err;
++  /*
++    Compose any decomposed unicode characters precomposed one.
++    This will solve the problem that the 'svn status' command sometime
++    cannot recognize as same file when files suppose to be comtain
++    comopsed characters, like umlaut in some European language or 
++    'Daku-ten' in Japanese, and the files are added on windows machines
++    then you use svn on Mac OS X checking out the files.
++  */
++  CFMutableStringRef cfmsr = CFStringCreateMutable(NULL, 0);
++  CFStringAppendCString(cfmsr, path_apr, kCFStringEncodingUTF8);
++  CFStringNormalize(cfmsr, kCFStringNormalizationFormC);
++  CFIndex path_buff_size = 1 + CFStringGetMaximumSizeForEncoding(
++    CFStringGetLength(cfmsr), kCFStringEncodingUTF8);
++  char *path = apr_palloc(pool, path_buff_size);
++  CFStringGetCString(cfmsr, path, path_buff_size, kCFStringEncodingUTF8);
++
++  SVN_ERR(get_path_encoding(&path_is_utf8, pool));
++
++  if (path_is_utf8)
++    {
++      *path_utf8 = apr_pstrdup(pool, path);
++      err = SVN_NO_ERROR;
++    }
++  else
++    err = svn_utf_cstring_to_utf8(path_utf8, path, pool);
++  CFRelease(cfmsr);
++  return err;
++#else
+   SVN_ERR(get_path_encoding(&path_is_utf8, pool));
+   if (path_is_utf8)
+     {
+@@ -1081,6 +1114,7 @@ svn_path_cstring_to_utf8(const char **path_utf8,
+     }
+   else
+     return svn_utf_cstring_to_utf8(path_utf8, path_apr, pool);
++#endif
+ }
+ 
+ 
