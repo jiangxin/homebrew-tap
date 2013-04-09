@@ -2,17 +2,17 @@ diff --git a/subversion/libsvn_subr/path.c b/subversion/libsvn_subr/path.c
 index 19cfcae..2b936ad 100644
 --- a/subversion/libsvn_subr/path.c
 +++ b/subversion/libsvn_subr/path.c
-@@ -59,6 +59,9 @@ svn_path_internal_style(const char *path, apr_pool_t *pool)
-   return svn_uri_internal_style(path, pool);
- }
+@@ -40,6 +40,9 @@
+ 
+ #include "dirent_uri.h"
  
 +#if defined(DARWIN)
 +#include <CoreFoundation/CoreFoundation.h>
 +#endif /* DARWIN */
  
- const char *
- svn_path_local_style(const char *path, apr_pool_t *pool)
-@@ -1073,6 +1076,36 @@ svn_path_cstring_to_utf8(const char **path_utf8,
+ /* The canonical empty path.  Can this be changed?  Well, change the empty
+    test below and the path library will work, not so sure about the fs/wc
+@@ -1120,6 +1123,36 @@
                           apr_pool_t *pool)
  {
    svn_boolean_t path_is_utf8;
@@ -49,7 +49,7 @@ index 19cfcae..2b936ad 100644
    SVN_ERR(get_path_encoding(&path_is_utf8, pool));
    if (path_is_utf8)
      {
-@@ -1081,6 +1114,7 @@ svn_path_cstring_to_utf8(const char **path_utf8,
+@@ -1128,6 +1161,7 @@
      }
    else
      return svn_utf_cstring_to_utf8(path_utf8, path_apr, pool);
