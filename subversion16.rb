@@ -4,7 +4,6 @@ def build_java?;   build.include? "java";   end
 def build_perl?;   build.include? "perl";   end
 def build_python?; build.include? "python"; end
 def build_ruby?;   build.include? "ruby";   end
-def build_tools?;  build.include? "tools";  end
 def with_unicode_path?; build.include? "unicode-path"; end
 
 class Subversion16 < Formula
@@ -17,8 +16,8 @@ class Subversion16 < Formula
   option 'perl', 'Build Perl bindings'
   option 'python', 'Build Python bindings'
   option 'ruby', 'Build Ruby bindings'
-  option 'tools','Build svn tools'
   option 'unicode-path', 'Include support for OS X UTF-8-MAC filename'
+  option 'without-tools','Do not build svn tools'
 
   depends_on 'pkg-config' => :build
 
@@ -117,9 +116,11 @@ class Subversion16 < Formula
     system "make install"
     (prefix+'etc/bash_completion.d').install 'tools/client-side/bash_completion' => 'subversion'
 
-    if build_tools?
+    if build.with? 'tools'
       system "make tools"
       system "make install-tools"
+      bin.install_symlink bin/"svn-tools"/"svnmucc"
+      bin.install_symlink bin/"svn-tools"/"svnauthz-validate"
     end
 
     if build_python?
