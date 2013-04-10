@@ -19,8 +19,10 @@ class Git18 < Formula
 
   option 'with-blk-sha1', 'Compile with the block-optimized SHA1 implementation'
   option 'without-completions', 'Disable bash/zsh completions from "contrib" directory'
+  option 'without-gettext', 'Disable gettext translations'
 
   depends_on 'pcre' => :optional
+  depends_on 'gettext' if build.with? 'gettext'
 
   def install
     # If these things are installed, tell Git build system to not use them
@@ -28,7 +30,6 @@ class Git18 < Formula
     ENV['NO_DARWIN_PORTS'] = '1'
     ENV['V'] = '1' # build verbosely
     ENV['NO_R_TO_GCC_LINKER'] = '1' # pass arguments to LD correctly
-    ENV['NO_GETTEXT'] = '1'
     ENV['PERL_PATH'] = which 'perl' # workaround for users of perlbrew
     ENV['PYTHON_PATH'] = which 'python' # python can be brewed or unbrewed
 
@@ -40,6 +41,13 @@ class Git18 < Formula
     if build.with? 'pcre'
       ENV['USE_LIBPCRE'] = '1'
       ENV['LIBPCREDIR'] = HOMEBREW_PREFIX
+    end
+
+    if build.with? 'gettext'
+      ENV['CFLAGS'] = '-I/usr/local/opt/gettext/include'
+      ENV['LDFLAGS'] = '-L/usr/local/opt/gettext/lib'
+    else
+      ENV['NO_GETTEXT'] = '1'
     end
 
     system "make", "prefix=#{prefix}",
