@@ -19,10 +19,9 @@ class Git18 < Formula
 
   option 'with-blk-sha1', 'Compile with the block-optimized SHA1 implementation'
   option 'without-completions', 'Disable bash/zsh completions from "contrib" directory'
-  option 'without-gettext', 'Disable gettext translations'
 
   depends_on 'pcre' => :optional
-  depends_on 'gettext' if build.with? 'gettext'
+  depends_on 'gettext' => :optional
 
   def install
     # If these things are installed, tell Git build system to not use them
@@ -43,12 +42,8 @@ class Git18 < Formula
       ENV['LIBPCREDIR'] = HOMEBREW_PREFIX
     end
 
-    if build.with? 'gettext'
-      ENV['CFLAGS'] = '-I/usr/local/opt/gettext/include'
-      ENV['LDFLAGS'] = '-L/usr/local/opt/gettext/lib'
-    else
-      ENV['NO_GETTEXT'] = '1'
-    end
+    # Without `--with-gettext` option, won't install Git l10n translations
+    ENV['NO_GETTEXT'] = '1' unless build.with? 'gettext'
 
     system "make", "prefix=#{prefix}",
                    "CC=#{ENV.cc}",

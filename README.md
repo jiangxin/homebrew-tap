@@ -95,14 +95,13 @@ Then you can do like that:
 Build git 
 ---------
 
-Homebrew builtin git formula does not compile with gettext, so translations
-of Git are not installed by default.
-
-Until upstream takes this hack:
+Homebrew builtin git formula does not know how to compile with gettext,
+so translations of Git can not be installed anyway. Until upstream takes
+this hack:
 
 * <https://github.com/mxcl/homebrew/pull/19097>
 
 You can install like this:
 
     $ brew unlink git git18
-    $ brew install git18
+    $ brew install --with-gettext git18
