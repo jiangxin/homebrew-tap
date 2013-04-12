@@ -119,8 +119,9 @@ class Subversion16 < Formula
     if build.with? 'tools'
       system "make tools"
       system "make install-tools"
-      bin.install_symlink bin/"svn-tools"/"svnmucc"
-      bin.install_symlink bin/"svn-tools"/"svnauthz-validate"
+      %w[svnmucc svnauthz-validate].each do |tool|
+        bin.install_symlink bin/"svn-tools"/tool
+      end
     end
 
     if build_python?
