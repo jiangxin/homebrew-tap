@@ -1,0 +1,29 @@
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/ossxp_hooks_output_in_utf8
+
+Bugfix: hooks utf-8 output raise locale to utf8 error.
+
+Signed-off-by: Jiang <jiangxin@ossxp.com>
+
+---
+ subversion/libsvn_repos/hooks.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/subversion/libsvn_repos/hooks.c b/subversion/libsvn_repos/hooks.c
+index 0a1b447..e2f0153 100644
+--- a/subversion/libsvn_repos/hooks.c
++++ b/subversion/libsvn_repos/hooks.c
+@@ -100,9 +100,9 @@ check_hook_result(const char *name, const char *cmd, apr_proc_t *cmd_proc,
+   if (!err2)
+     {
+       err2 = svn_utf_cstring_to_utf8(&utf8_stderr, native_stderr->data, pool);
++      /* ossxp.com: hooks already with utf8 stderr output */
+       if (err2)
+-        utf8_stderr = _("[Error output could not be translated from the "
+-                        "native locale to UTF-8.]");
++        utf8_stderr = native_stderr->data;
+     }
+   else
+     {
+-- 
+tg: (c7ade5d..) t/ossxp_hooks_output_in_utf8 (depends on: master)
