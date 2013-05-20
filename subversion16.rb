@@ -47,6 +47,8 @@ class Subversion16 < Formula
     #  ps << "https://raw.github.com/jiangxin/homebrew-tap/11c36125787fc8417df5c0459377aeb09952dd17/0001-swig-perl.diff"
     #end
 
+    ps << "https://raw.github.com/jiangxin/homebrew-tap/da8df59cdb2eac3c211ae7a86429e84d318dc570/0004-hook-output-to-utf8-tolerant.diff"
+
     unless ps.empty?
       { :p1 => ps }
     end
