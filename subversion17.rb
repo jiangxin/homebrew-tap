@@ -17,7 +17,11 @@ class Subversion17 < Formula
   option 'python', 'Build Python bindings'
   option 'ruby', 'Build Ruby bindings'
   option 'unicode-path', 'Include support for OS X UTF-8-MAC filename'
-  option 'without-tools','Do not build svn tools'
+
+  resource 'serf' do
+    url 'http://serf.googlecode.com/files/serf-1.3.2.tar.bz2'
+    sha1 '90478cd60d4349c07326cb9c5b720438cf9a1b5d'
+  end
 
   depends_on 'pkg-config' => :build
 
@@ -27,6 +31,10 @@ class Subversion17 < Formula
 
   # Building Ruby bindings requires libtool
   depends_on :libtool if build_ruby?
+
+  # For Serf
+  depends_on 'scons' => :build
+  depends_on 'openssl' if build.with? 'brewed-openssl'
 
   def patches
     ps = []
@@ -70,6 +78,24 @@ class Subversion17 < Formula
     # https://github.com/mxcl/homebrew/issues/13226
     ENV.deparallelize
 
+    serf_prefix = libexec+'serf'
+
+    resource('serf').stage do
+      # SConstruct merges in gssapi linkflags using scons's MergeFlags,
+      # but that discards duplicate values - including the duplicate
+      # values we want, like multiple -arch values for a universal build.
+      # Passing 0 as the `unique` kwarg turns this behaviour off.
+      inreplace 'SConstruct', 'unique=1', 'unique=0'
+
+      ENV.universal_binary if build.universal?
+      # scons ignores our compiler and flags unless explicitly passed
+      args = %W[PREFIX=#{serf_prefix} GSSAPI=/usr CC=#{ENV.cc}
+                CFLAGS=#{ENV.cflags} LINKFLAGS=#{ENV.ldflags}]
+      args << "OPENSSL=#{Formula.factory('openssl').opt_prefix}" if build.with? 'brewed-openssl'
+      system "scons", *args
+      system "scons install"
+    end
+
     if build_java?
       unless build.universal?
         opoo "A non-Universal Java build was requested."
@@ -93,7 +119,7 @@ class Subversion17 < Formula
             "--with-ssl",
             "--with-zlib=/usr",
             "--with-sqlite=#{Formula.factory('sqlite').opt_prefix}",
-            "--with-neon=#{Formula.factory('neon').opt_prefix}",
+            "--with-serf=#{serf_prefix}",
             # use our neon, not OS X's
             "--disable-neon-version-check",
             "--disable-mod-activation",
@@ -117,13 +143,8 @@ class Subversion17 < Formula
     system "make install"
     (prefix+'etc/bash_completion.d').install 'tools/client-side/bash_completion' => 'subversion'
 
-    if build.with? 'tools'
-      system "make tools"
-      system "make install-tools"
-      %w[svnmucc svnauthz-validate].each do |tool|
-        bin.install_symlink bin/"svn-tools"/tool
-      end
-    end
+    system "make tools"
+    system "make install-tools"
 
     if build_python?
       system "make swig-py"
