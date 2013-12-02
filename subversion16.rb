@@ -24,7 +24,6 @@ class Subversion16 < Formula
   # Always build against Homebrew versions instead of system versions for consistency.
   depends_on 'neon'
   depends_on 'sqlite'
-  depends_on 'serf'
 
   # Building Ruby bindings requires libtool
   depends_on :libtool if build_ruby?
@@ -63,7 +62,7 @@ class Subversion16 < Formula
   end if build_perl? or build_python? or build_ruby?
 
   def apr_bin
-    superbin or "/usr/bin"
+    Superenv.bin or "/usr/bin"
   end
 
   def install
@@ -94,7 +93,7 @@ class Subversion16 < Formula
             "--with-ssl",
             "--with-zlib=/usr",
             "--with-sqlite=#{Formula.factory('sqlite').opt_prefix}",
-            "--with-serf=#{Formula.factory('serf').opt_prefix}",
+            "--with-neon=#{Formula.factory('neon').opt_prefix}",
             # use our neon, not OS X's
             "--disable-neon-version-check",
             "--disable-mod-activation",
