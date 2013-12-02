@@ -8,8 +8,8 @@ def with_unicode_path?; build.include? "unicode-path"; end
 
 class Subversion17 < Formula
   homepage 'http://subversion.apache.org/'
-  url 'http://archive.apache.org/dist/subversion/subversion-1.7.9.tar.bz2'
-  sha1 '453757bae78a800997559f2232483ab99238ec1e'
+  url 'http://archive.apache.org/dist/subversion/subversion-1.7.14.tar.bz2'
+  sha1 'b35254a844d0b221a3fd8e80974ac75119d77b94'
 
   option :universal
   option 'java', 'Build Java bindings'
